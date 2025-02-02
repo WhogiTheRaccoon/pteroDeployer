@@ -17,8 +17,8 @@
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/nodendeployer.git
-    cd nodendeployer
+    git clone https://github.com/WhogiTheRaccoon/pteroDeployer.git
+    cd pteroDeployer
     ```
 
 2. Install dependencies:
