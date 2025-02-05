@@ -21,8 +21,7 @@ async function findUnusedIp() {
 // Create User in pterodactyl.
 export async function getOrCreateUser({username, firstName, lastName, email, externalId, password}: CreateUserOptions) { 
     const users = await application.getAllUsers();
-    let existingUser = users.find((u) => u.attributes.username === `${username}`);
-
+    let existingUser = users.find((u) => u.attributes.email === `${email}`);
     return existingUser?.attributes.id ?? (await application.createUser(username, firstName, lastName, email, undefined, undefined, undefined, externalId)).id;
 }
 
@@ -45,6 +44,7 @@ export async function createServer({name, ownerId, description, nestId, eggId, d
 }
 
 export async function deleteServer(serverId: any) {
+    await db.update(schema.deployedServers).set({status: 'expired'}).where(eq(schema.deployedServers.serverId, serverId));
     return await application.deleteServer(serverId);
 }
 
@@ -56,6 +56,38 @@ export async function checkExistingServers(user: any) {
     if (userServers.length >= maxServers) throw new Error(`Sorry ${user.username}, you already have ${userServers.length} server/s. (Max ${maxServers})`);
 
     return userServers;
+}
+
+export async function fetchUserServers(userid: string) {
+    const userServers = await db.select().from(schema.deployedServers).where(and(eq(schema.deployedServers.discordUser, userid), eq(schema.deployedServers.status, 'active')));
+
+    const serverArray = await Promise.all(
+        userServers.map(async (server) => {
+            const pteroServer = await application.getServerInfo(server.serverId);
+            return {
+                name: pteroServer.name,
+                value: pteroServer.id.toString(),
+            };
+        })
+    );
+
+    return serverArray;
+}
+
+export async function fetchAllServers() {
+    const servers = await db.select().from(schema.deployedServers).where(eq(schema.deployedServers.status, 'active'));
+
+    const serverArray = await Promise.all(
+        servers.map(async (server) => {
+            const pteroServer = await application.getServerInfo(server.serverId);
+            return {
+                name: pteroServer.name,
+                value: pteroServer.id.toString(),
+            };
+        })
+    );
+
+    return serverArray;
 }
 
 // Set row so server expires after 1 week

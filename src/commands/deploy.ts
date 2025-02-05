@@ -1,5 +1,5 @@
 import { CommandType } from "wokcommands";
-import { CommandInteraction, EmbedBuilder, MessageFlags } from "discord.js";
+import { CommandInteraction, EmbedBuilder, MessageFlags, AutocompleteInteraction } from "discord.js";
 import { deployInstance, checkExistingServers } from "../utils/pterodactyl";
 import { sendToChannel } from "../utils/logging";
 import fs from 'fs/promises';
@@ -41,7 +41,7 @@ module.exports = {
 
     // Kind of a weird approach for autocomplete options, But I wanted to make adding or removing games as simple as possible for inexperienced admins. The main issue is every installation
     // can have different nest/egg Ids. This way it's just a matter of adding or removing lines from the games.csv file.
-    autocomplete: async ({ interaction }: { interaction: CommandInteraction }) => {
+    autocomplete: async (interaction: AutocompleteInteraction) => {
         try {
             const filePath = path.join(__dirname, '../games.csv');
             const gamesData = await fs.readFile(filePath, 'utf-8');

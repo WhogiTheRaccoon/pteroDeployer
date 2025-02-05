@@ -1,5 +1,5 @@
 import { CommandType } from "wokcommands";
-import { EmbedBuilder, PermissionFlagsBits } from "discord.js";
+import { EmbedBuilder, PermissionFlagsBits, AutocompleteInteraction } from "discord.js";
 
 module.exports = {
     category: 'general',
@@ -18,7 +18,7 @@ module.exports = {
         },
     ],
 
-    autocomplete: async ({ interaction }: any) => {
+    autocomplete: async (interaction : AutocompleteInteraction) => {
         const embeds = ['introduction'];
 
         return embeds.map(embed => {
